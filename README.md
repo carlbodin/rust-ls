@@ -1,6 +1,6 @@
-# rust-ls
+# ls-rs
 
-`rust-ls` is a small `ls`-style directory lister written in Rust with no external dependencies.
+`ls-rs` is a small `ls`-style directory lister written in Rust with no external dependencies.
 
 ## Features
 

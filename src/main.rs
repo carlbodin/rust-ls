@@ -100,7 +100,7 @@ fn main() {
     match run() {
         Ok(code) => std::process::exit(code),
         Err(err) => {
-            eprintln!("rust-ls: {err}");
+            eprintln!("ls-rs: {err}");
             std::process::exit(1);
         }
     }
@@ -120,7 +120,7 @@ fn run() -> Result<i32, String> {
 
     for path in &paths {
         if let Err(err) = list_path(path, &config, show_headers, &mut first_section) {
-            eprintln!("rust-ls: {}: {err}", path.display());
+            eprintln!("ls-rs: {}: {err}", path.display());
             exit_code = 1;
         }
     }
@@ -148,7 +148,7 @@ where
                     std::process::exit(0);
                 }
                 "--version" => {
-                    println!("rust-ls {VERSION}");
+                    println!("ls-rs {VERSION}");
                     std::process::exit(0);
                 }
                 "--human-readable" => config.human_readable = true,
@@ -205,8 +205,8 @@ where
 
 fn print_help() {
     println!(
-        "rust-ls {VERSION}\n\n\
-Usage: rust-ls [OPTIONS] [PATH...]\n\n\
+        "ls-rs {VERSION}\n\n\
+Usage: ls-rs [OPTIONS] [PATH...]\n\n\
 Options:\n\
   -a                show hidden entries, including . and ..\n\
   -A                show hidden entries except . and ..\n\
