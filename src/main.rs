@@ -34,6 +34,7 @@ struct Config {
     directory_only: bool,
     human_readable: bool,
     classify: bool,
+    count_children: bool,
     sort_mode: SortMode,
     color: ColorMode,
     paths: Vec<PathBuf>,
@@ -76,7 +77,7 @@ fn run() -> Result<i32, String> {
         std::mem::take(&mut config.paths)
     };
 
-    let show_headers = config.recursive || paths.len() > 1;
+    let show_headers = config.recursive || config.count_children || paths.len() > 1;
     let mut exit_code = 0;
     let mut first_section = true;
 
@@ -116,6 +117,7 @@ where
                 "--human-readable" => config.human_readable = true,
                 "--recursive" => config.recursive = true,
                 "--classify" => config.classify = true,
+                "--count-children" => config.count_children = true,
                 "--reverse" => config.reverse = true,
                 "--unsorted" => config.sort_mode = SortMode::Unsorted,
                 "--sort=time" => config.sort_mode = SortMode::Time,
@@ -140,6 +142,7 @@ where
                     'r' => config.reverse = true,
                     'd' => config.directory_only = true,
                     'F' => config.classify = true,
+                    'c' => config.count_children = true,
                     'H' => config.human_readable = true,
                     't' => config.sort_mode = SortMode::Time,
                     'S' => config.sort_mode = SortMode::Size,
@@ -176,6 +179,7 @@ Options:\n\
   -r, --reverse     reverse sort order\n\
   -d                list directories themselves, not their contents\n\
   -F, --classify    append /, *, or @ where useful\n\
+  -c, --count-children  show direct child counts for directories\n\
   -H, --human-readable  show sizes using human-friendly units\n\
   -t, --sort=time   sort by modification time\n\
   -S, --sort=size   sort by file size\n\
@@ -341,7 +345,11 @@ fn print_section(
         }
 
         if let Some(path) = header_path {
-            println!("{}:", path.display());
+            if config.count_children {
+                println!("{}: [{} entries]", path.display(), entries.len());
+            } else {
+                println!("{}:", path.display());
+            }
         }
 
         *first_section = false;
@@ -635,7 +643,7 @@ mod tests {
     #[test]
     fn parses_flags_and_paths() {
         let config = parse_args(vec![
-            String::from("-al1RH"),
+            String::from("-al1RcH"),
             String::from("--sort=time"),
             String::from("src"),
             String::from("Cargo.toml"),
@@ -646,6 +654,7 @@ mod tests {
         assert!(config.long);
         assert!(config.one_per_line);
         assert!(config.recursive);
+        assert!(config.count_children);
         assert!(config.human_readable);
         assert_eq!(config.sort_mode, SortMode::Time);
         assert_eq!(
